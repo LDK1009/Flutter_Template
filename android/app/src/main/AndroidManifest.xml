@@ -5,7 +5,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
     
     <application
-        android:label="해리포터 마법 주문"
+        android:label="해리포터 마법 주문" // 🔄 새 프로젝트 생성 시 수정 (앱 이름)
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
