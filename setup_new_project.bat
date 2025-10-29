@@ -119,7 +119,7 @@ echo   ✓ build.gradle.kts 수정 완료
 
 REM -------- AndroidManifest.xml 수정 --------
 REM 앱 이름(레이블) 수정
-powershell -Command "(Get-Content 'android\app\src\main\AndroidManifest.xml') -replace 'android:label=\".*?\" // 🔄 새 프로젝트 생성 시 수정 \(앱 이름\)', 'android:label=\"%APP_NAME%\" // 🔄 새 프로젝트 생성 시 수정 (앱 이름)' | Set-Content 'android\app\src\main\AndroidManifest.xml'"
+powershell -Command "(Get-Content 'android\app\src\main\AndroidManifest.xml') -replace 'android:label=\".*?\"', 'android:label=\"%APP_NAME%\"' | Set-Content 'android\app\src\main\AndroidManifest.xml'"
 echo   ✓ AndroidManifest.xml 수정 완료
 
 REM -------- pubspec.yaml 수정 --------
