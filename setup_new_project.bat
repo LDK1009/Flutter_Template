@@ -59,15 +59,13 @@ echo [3/5] 새 키스토어 생성 중...
 cd android\app
 REM android\app 디렉토리로 이동 (키스토어 저장 위치)
 
-echo.
-echo 다음 정보를 입력하세요:
-echo (엔터를 눌러 건너뛰기 가능)
-
 REM keytool: Java 키스토어 생성 도구
 REM -genkey: 키 생성, -v: 상세정보 표시, -keystore: 파일명
 REM -keyalg RSA: RSA 알고리즘, -keysize 2048: 키 크기
 REM -validity 10000: 10000일 유효, -alias upload: 별칭
-keytool -genkey -v -keystore upload-keystore.jks -keyalg RSA -keysize 2048 -validity 10000 -alias upload -storepass "%KEYSTORE_PASSWORD%" -keypass "%KEYSTORE_PASSWORD%"
+REM -storepass와 -keypass: 비밀번호 직접 지정
+REM -dname: 인증서 정보를 직접 지정하여 대화형 입력 회피 (반복 입력 방지)
+keytool -genkey -v -keystore upload-keystore.jks -keyalg RSA -keysize 2048 -validity 10000 -alias upload -storepass "%KEYSTORE_PASSWORD%" -keypass "%KEYSTORE_PASSWORD%" -dname "CN=Devpreneur, OU=Dev, O=Devpreneur, L=Seoul, ST=Seoul, C=KR"
 
 cd ..\..
 REM 원래 디렉토리로 돌아가기 (프로젝트 루트)
@@ -102,35 +100,36 @@ echo [5/5] 프로젝트 파일 수정 중...
 REM -------- build.gradle.kts 수정 --------
 REM PowerShell을 이용해 파일 내용 치환 (정규식 사용)
 REM Get-Content: 파일 읽기, -replace: 치환, Set-Content: 파일 쓰기
+REM -Encoding UTF8: UTF-8 인코딩으로 저장 (한글 깨짐 방지)
 
 REM namespace 수정 (Android 패키지명)
-powershell -Command "(Get-Content 'android\app\build.gradle.kts') -replace 'namespace = \".*?\" // 🔄 새 프로젝트 생성 시 수정 \(예: com\.company\.appname\)', 'namespace = \"%APP_ID%\" // 🔄 새 프로젝트 생성 시 수정 (예: com.company.appname)' | Set-Content 'android\app\build.gradle.kts'"
+powershell -Command "$content = Get-Content 'android\app\build.gradle.kts' -Encoding UTF8; $content -replace 'namespace\s*=\s*\".*?\"', 'namespace = \"%APP_ID%\"' | Set-Content 'android\app\build.gradle.kts' -Encoding UTF8"
 
 REM applicationId 수정 (앱 고유 식별자)
-powershell -Command "(Get-Content 'android\app\build.gradle.kts') -replace 'applicationId = \".*?\" // 🔄 새 프로젝트 생성 시 수정 \(예: com\.company\.appname\)', 'applicationId = \"%APP_ID%\" // 🔄 새 프로젝트 생성 시 수정 (예: com.company.appname)' | Set-Content 'android\app\build.gradle.kts'"
+powershell -Command "$content = Get-Content 'android\app\build.gradle.kts' -Encoding UTF8; $content -replace 'applicationId\s*=\s*\".*?\"', 'applicationId = \"%APP_ID%\"' | Set-Content 'android\app\build.gradle.kts' -Encoding UTF8"
 
 REM versionCode 수정 (앱 버전 코드, 숫자)
-powershell -Command "(Get-Content 'android\app\build.gradle.kts') -replace 'versionCode = \d+ // 🔄 새 프로젝트 생성 시 수정 \(1로 시작\)', 'versionCode = 1 // 🔄 새 프로젝트 생성 시 수정 (1로 시작)' | Set-Content 'android\app\build.gradle.kts'"
+powershell -Command "$content = Get-Content 'android\app\build.gradle.kts' -Encoding UTF8; $content -replace 'versionCode = \\d+ // 🔄 새 프로젝트 생성 시 수정 \\(1로 시작\\)', 'versionCode = 1 // 🔄 새 프로젝트 생성 시 수정 (1로 시작)' | Set-Content 'android\app\build.gradle.kts' -Encoding UTF8"
 
 REM versionName 수정 (앱 버전 이름, 문자열)
-powershell -Command "(Get-Content 'android\app\build.gradle.kts') -replace 'versionName = \".*?\" // 🔄 새 프로젝트 생성 시 수정 \(1\.0\.0으로 시작\)', 'versionName = \"1.0.0\" // 🔄 새 프로젝트 생성 시 수정 (1.0.0으로 시작)' | Set-Content 'android\app\build.gradle.kts'"
+powershell -Command "$content = Get-Content 'android\app\build.gradle.kts' -Encoding UTF8; $content -replace 'versionName = \".*?\" // 🔄 새 프로젝트 생성 시 수정 \\(1\\.0\\.0으로 시작\\)', 'versionName = \"1.0.0\" // 🔄 새 프로젝트 생성 시 수정 (1.0.0으로 시작)' | Set-Content 'android\app\build.gradle.kts' -Encoding UTF8"
 
 echo   ✓ build.gradle.kts 수정 완료
 
 REM -------- AndroidManifest.xml 수정 --------
-REM 앱 이름(레이블) 수정
-powershell -Command "(Get-Content 'android\app\src\main\AndroidManifest.xml') -replace 'android:label=\".*?\"', 'android:label=\"%APP_NAME%\"' | Set-Content 'android\app\src\main\AndroidManifest.xml'"
+REM 앱 이름(레이블) 수정 - UTF-8 인코딩 지정 필수 (한글 깨짐 방지)
+powershell -Command "$content = Get-Content 'android\app\src\main\AndroidManifest.xml' -Encoding UTF8; $content -replace 'android:label=\".*?\"', 'android:label=\"%APP_NAME%\"' | Set-Content 'android\app\src\main\AndroidManifest.xml' -Encoding UTF8"
 echo   ✓ AndroidManifest.xml 수정 완료
 
 REM -------- pubspec.yaml 수정 --------
-REM 프로젝트 이름 수정 (^는 줄 시작을 의미)
-powershell -Command "(Get-Content 'pubspec.yaml') -replace '^name: .*? # 🔄 새 프로젝트 생성 시 수정 \(프로젝트 코드명\)', 'name: %PROJECT_NAME% # 🔄 새 프로젝트 생성 시 수정 (프로젝트 코드명)' | Set-Content 'pubspec.yaml'"
+REM 프로젝트 이름 수정 (^는 줄 시작을 의미) - UTF-8 인코딩
+powershell -Command "$content = Get-Content 'pubspec.yaml' -Encoding UTF8; $content -replace '^name:\s*.*$', 'name: %PROJECT_NAME% # 🔄 새 프로젝트 생성 시 수정 (프로젝트 코드명)' | Set-Content 'pubspec.yaml' -Encoding UTF8"
 
-REM 앱 설명 수정
-powershell -Command "(Get-Content 'pubspec.yaml') -replace '^description: .*? # 🔄 새 프로젝트 생성 시 수정', 'description: %APP_DESC% # 🔄 새 프로젝트 생성 시 수정' | Set-Content 'pubspec.yaml'"
+REM 앱 설명 수정 - UTF-8 인코딩
+powershell -Command "$content = Get-Content 'pubspec.yaml' -Encoding UTF8; $content -replace '^description: .*? # 🔄 새 프로젝트 생성 시 수정', 'description: %APP_DESC% # 🔄 새 프로젝트 생성 시 수정' | Set-Content 'pubspec.yaml' -Encoding UTF8"
 
-REM 버전 수정 (1.0.0+1 형식: 버전명+빌드번호)
-powershell -Command "(Get-Content 'pubspec.yaml') -replace '^version: .*? # 🔄 새 프로젝트 생성 시 수정 \(1\.0\.0\+1로 시작\)', 'version: 1.0.0+1 # 🔄 새 프로젝트 생성 시 수정 (1.0.0+1로 시작)' | Set-Content 'pubspec.yaml'"
+REM 버전 수정 (1.0.0+1 형식: 버전명+빌드번호) - UTF-8 인코딩
+powershell -Command "$content = Get-Content 'pubspec.yaml' -Encoding UTF8; $content -replace '^version: .*? # 🔄 새 프로젝트 생성 시 수정 \\(1\\.0\\.0\\+1로 시작\\)', 'version: 1.0.0+1 # 🔄 새 프로젝트 생성 시 수정 (1.0.0+1로 시작)' | Set-Content 'pubspec.yaml' -Encoding UTF8"
 
 echo   ✓ pubspec.yaml 수정 완료
 
