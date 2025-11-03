@@ -1,9 +1,9 @@
-﻿name: harrypotter_magic_spells # ?? ? ???? ?? ? ?? (???? ???)
-description: ???? ?? ??? ??? ???? ?? ? # ?? ? ???? ?? ? ??
+﻿name: fluttertemplate # 프로젝트 이름을 여기에 변경하세요 (예: my_app)
+description: 새로운 Flutter 앱을 빠르게 시작하기 위한 기본 템플릿 # 프로젝트 설명을 여기에 변경하세요
 
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
-version: 1.0.0+3 # ?? ? ???? ?? ? ?? (1.0.0+1? ??)
+version: 1.0.0+1 # 버전을 여기에 변경하세요 (1.0.0+1 형식)
 
 environment:
   sdk: '>=2.19.4 <4.0.0'
@@ -17,6 +17,7 @@ dependencies:
   torch_light: ^1.1.0
   speech_to_text: ^7.0.0
   audioplayers: ^6.5.1
+  google_mobile_ads: ^5.1.0
 
 dev_dependencies:
   flutter_test:
